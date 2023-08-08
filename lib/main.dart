@@ -85,6 +85,7 @@ class _QuoteHomeState extends State<QuoteHome> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -96,42 +97,39 @@ class _QuoteHomeState extends State<QuoteHome> {
         child: Center(
           child: Column(
             
-            children: quotes.map((quote) => QuoteCard(
-              quote: quote,
-              delete: () {
-                setState(() {
-                  quotes.remove(quote);
-                });
-              },
-              changeText: () async {
-                print('hanging text');
-                await _displayTextInputDialog(context);
-                setState(() {
+            children: quotes.map((quote) {
+              return QuoteCard(
+                color: quote.found == false ? Colors.white : Colors.orangeAccent,
+                quote: quote,
+                delete: () {
+                  setState(() {
+                    quotes.remove(quote);
+                  });
+                },
+                changeText: () async {
+                  await _displayTextInputDialog(context);
+                  setState(() {
 
-                  if(valueText1 != null) {quote.text = valueText1!;}
-                  if(valueText2 != null) {quote.author = valueText2!;}
-                  makeValueNull();
+                    if(valueText1 != null) {quote.text = valueText1!;}
+                    if(valueText2 != null) {quote.author = valueText2!;}
+                    makeValueNull();
 
-                });
-              },
-              changeColor: () {
-                //this code gets run for EVERY card regardless if you clicked on it
-
-                if(quote.found) {
-                  cardcolor = Colors.white;
-                  quote.found = false;
-                } else {
-                  cardcolor = Colors.orangeAccent;
-                  quote.found = true;
-                }
-
-
-
-
-              },
-              color: cardcolor,
-
-            )).toList(),
+                  });
+                },
+                changeColor: () {
+                  //this code gets run for EVERY card regardless if you clicked on it
+                  setState(() {
+                    if(quote.found) {
+                      cardcolor = Colors.white;
+                      quote.found = false;
+                    } else {
+                      cardcolor = Colors.orangeAccent;
+                      quote.found = true;
+                    }
+                  });
+                },
+              );
+            }).toList(),
           ),
         ),
       ),
@@ -174,10 +172,12 @@ class _QuoteHomeState extends State<QuoteHome> {
           FloatingActionButton(
             backgroundColor: Colors.blue[300],
             onPressed: () {
-
+              setState(() {
+                quotes.clear();
+              });
             },
             child: const Icon(
-              Icons.save,
+              Icons.delete_forever,
               size: 40,
             ),
           ),

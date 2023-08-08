@@ -14,6 +14,7 @@ class QuoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+
       onLongPress: changeText,
       onTap: changeColor,
       child: Card(
