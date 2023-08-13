@@ -1,13 +1,16 @@
-
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'quote.dart';
 import 'quotetemplate.dart';
+import 'save.dart';
 
 void main() {
+
   runApp(MaterialApp(
     home: QuoteHome(),
   ));
+
 }
 
 class QuoteHome extends StatefulWidget {
@@ -17,9 +20,15 @@ class QuoteHome extends StatefulWidget {
 }
 
 class _QuoteHomeState extends State<QuoteHome> {
+
+
+
   List<Quote> quotes = [
     Quote(author: 'Yasha', text: 'Hold Me'),
   ];
+
+  Save save = new Save();
+  bool viewMode = false;
 
   final TextEditingController _textFieldController1 = TextEditingController();
   final TextEditingController _textFieldController2 = TextEditingController();
@@ -31,7 +40,9 @@ class _QuoteHomeState extends State<QuoteHome> {
     valueText2 = null;
   }
 
+
   Future<void> _displayTextInputDialog(BuildContext context) async {
+
     return showDialog(
         context: context,
         builder: (context) {
@@ -68,6 +79,7 @@ class _QuoteHomeState extends State<QuoteHome> {
                 textColor: Colors.white,
                 child: Text('OK'),
                 onPressed: () {
+
                   setState(() {
                     _textFieldController1.text = "";
                     _textFieldController2.text = "";
@@ -96,11 +108,57 @@ class _QuoteHomeState extends State<QuoteHome> {
       body: SingleChildScrollView(
         child: Center(
           child: Column(
-            
             children: quotes.map((quote) {
+
+              Column textColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    quote.text,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey[800],
+
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    '- ${quote.author}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey[800],
+
+                    ),
+                  ),
+                ],
+              );
+
+              Expanded deleteExpanded = Expanded(
+                flex: 2,
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      quotes.remove(quote);
+                    });
+                  },
+                  label: Text("Delete"),
+                  icon: Icon(Icons.delete),
+                ),
+              );
+
+              if(viewMode) {
+                Widget temp = textColumn.children.first;
+                textColumn.children.clear();
+                textColumn.children.add(temp);
+
+                deleteExpanded = Expanded(child: Container());
+              }
+
+
               return QuoteCard(
                 color: quote.found == false ? Colors.white : Colors.orangeAccent,
                 quote: quote,
+                textColumn: textColumn,
                 delete: () {
                   setState(() {
                     quotes.remove(quote);
@@ -128,6 +186,7 @@ class _QuoteHomeState extends State<QuoteHome> {
                     }
                   });
                 },
+                deleteExpanded: deleteExpanded,
               );
             }).toList(),
           ),
@@ -136,6 +195,19 @@ class _QuoteHomeState extends State<QuoteHome> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          FloatingActionButton(
+            backgroundColor: Colors.blue[300],
+            onPressed: () {
+              setState(() {
+                viewMode = !viewMode;
+              });
+            },
+            child: const Icon(
+              Icons.remove_red_eye_rounded,
+              size: 40,
+            ),
+          ),
+          SizedBox(height: 20,),
           FloatingActionButton(
             backgroundColor: Colors.blue[300],
             onPressed: () {
@@ -171,13 +243,22 @@ class _QuoteHomeState extends State<QuoteHome> {
           SizedBox(height: 20,),
           FloatingActionButton(
             backgroundColor: Colors.blue[300],
-            onPressed: () {
-              setState(() {
+            onPressed: () async {
+              String text = '';
+
+                await Save().writeFile(quotes);
+                text = await (Save().readFile()) as String;
+                print(jsonDecode(text)['found']);
+
+
+
+
+              /*setState(() {
                 quotes.clear();
-              });
+              });*/
             },
             child: const Icon(
-              Icons.delete_forever,
+              Icons.save,
               size: 40,
             ),
           ),

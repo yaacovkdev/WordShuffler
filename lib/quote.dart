@@ -6,4 +6,12 @@ class Quote{
   bool found = false;
 
   Quote({required this.author, required this.text});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'author': author,
+      'text': text,
+      'found': found,
+    };
+  }
 }

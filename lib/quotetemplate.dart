@@ -8,8 +8,10 @@ class QuoteCard extends StatelessWidget {
   final Function() delete;
   final Function() changeText;
   final Function() changeColor;
+  final Column textColumn;
+  final Expanded deleteExpanded;
 
-  QuoteCard({required this.quote, required this.delete, required this.changeText, required this.changeColor, required this.color});
+  QuoteCard({required this.quote, required this.delete, required this.changeText, required this.changeColor, required this.color, required this.textColumn, required this.deleteExpanded});
 
   @override
   Widget build(BuildContext context) {
@@ -21,44 +23,40 @@ class QuoteCard extends StatelessWidget {
         color: color,
         margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(10.0),
           child: Column(
 
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
 
-              children: <Widget>[
-                Text(
-                  quote.text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey[800],
+                  children: <Widget>[
+                    Row(
 
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  '- ${quote.author}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey[800],
 
-                  ),
-                ),
-                SizedBox(height: 8,),
-                TextButton.icon(
-                    onPressed: delete,
-                    label: Text("Delete"),
-                    icon: Icon(Icons.delete),
-                ),
-                /*TextButton.icon(
-                onPressed: () {},
-                child: Icon(
 
-                )
-              ),*/
-              ]
-          ),
+                      children: <Widget>[
+                        Expanded(
+                          flex: 5,
+
+                          child: textColumn,
+                        ),
+                        SizedBox(width: 20),
+
+                        deleteExpanded,
+
+
+                      ],
+
+                    ),
+
+                    /*TextButton.icon(
+                    onPressed: () {},
+                    child: Icon(
+
+                    )
+                  ),*/
+                  ],
+              ),
         ),
       ),
     );
