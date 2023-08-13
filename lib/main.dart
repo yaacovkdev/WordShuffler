@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:quotelist/viewquotetemplate.dart';
 import 'quote.dart';
 import 'quotetemplate.dart';
 import 'save.dart';
@@ -21,11 +22,7 @@ class QuoteHome extends StatefulWidget {
 
 class _QuoteHomeState extends State<QuoteHome> {
 
-
-
-  List<Quote> quotes = [
-    Quote(author: 'Yasha', text: 'Hold Me'),
-  ];
+  List<Quote> quotes = [];
 
   Save save = new Save();
   bool viewMode = false;
@@ -40,6 +37,18 @@ class _QuoteHomeState extends State<QuoteHome> {
     valueText2 = null;
   }
 
+  changeCardColor(Quote quote) {
+    //this code gets run for EVERY card regardless if you clicked on it
+    setState(() {
+      if(quote.found) {
+        cardcolor = Colors.white;
+        quote.found = false;
+      } else {
+        cardcolor = Colors.orangeAccent;
+        quote.found = true;
+      }
+    });
+  }
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
 
@@ -92,16 +101,13 @@ class _QuoteHomeState extends State<QuoteHome> {
         });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Empire Shuffler v0.0.3'),
+        title: Text('Empire Shuffler v0.1'),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
@@ -110,55 +116,25 @@ class _QuoteHomeState extends State<QuoteHome> {
           child: Column(
             children: quotes.map((quote) {
 
-              Column textColumn = Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    quote.text,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey[800],
-
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    '- ${quote.author}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey[800],
-
-                    ),
-                  ),
-                ],
-              );
-
-              Expanded deleteExpanded = Expanded(
-                flex: 2,
-                child: TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      quotes.remove(quote);
-                    });
-                  },
-                  label: Text("Delete"),
-                  icon: Icon(Icons.delete),
-                ),
-              );
+              if(quote.found){
+                cardcolor = Colors.orangeAccent.withOpacity(0.5);
+              } else {
+                cardcolor = Colors.white;
+              }
 
               if(viewMode) {
-                Widget temp = textColumn.children.first;
-                textColumn.children.clear();
-                textColumn.children.add(temp);
-
-                deleteExpanded = Expanded(child: Container());
+                return ViewQuoteCard(
+                  quote: quote,
+                  color: cardcolor,
+                  changeColor: () => changeCardColor(quote),
+                );
               }
 
 
-              return QuoteCard(
-                color: quote.found == false ? Colors.white : Colors.orangeAccent,
+              return EditQuoteCard(
                 quote: quote,
-                textColumn: textColumn,
+                color: cardcolor,
+                changeColor: () => changeCardColor(quote),
                 delete: () {
                   setState(() {
                     quotes.remove(quote);
@@ -174,19 +150,6 @@ class _QuoteHomeState extends State<QuoteHome> {
 
                   });
                 },
-                changeColor: () {
-                  //this code gets run for EVERY card regardless if you clicked on it
-                  setState(() {
-                    if(quote.found) {
-                      cardcolor = Colors.white;
-                      quote.found = false;
-                    } else {
-                      cardcolor = Colors.orangeAccent;
-                      quote.found = true;
-                    }
-                  });
-                },
-                deleteExpanded: deleteExpanded,
               );
             }).toList(),
           ),
