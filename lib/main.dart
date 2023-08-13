@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quotelist/viewquotetemplate.dart';
+import 'package:radial_button/widget/circle_floating_button.dart';
 import 'quote.dart';
 import 'quotetemplate.dart';
 import 'save.dart';
@@ -48,6 +50,118 @@ class _QuoteHomeState extends State<QuoteHome> {
         quote.found = true;
       }
     });
+  }
+
+  Color? colorOnEmpty(){
+    Color? main = Colors.white;
+    if(quotes.isEmpty){
+      main = Colors.grey[300];
+      return main;
+    } else {
+      main = Colors.blue[300];
+      return main;
+    }
+  }
+
+  Widget tutorialDisplay(){
+    return Container(
+      margin: EdgeInsets.all(50),
+
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              'Instructions!',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.red,
+              ),
+            ),
+            SizedBox(height: 15,),
+            Text(
+              '1. Press the Eye Button to switch between Edit and View Modes',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.red,
+              ),
+            ),
+            SizedBox(height: 15,),
+            Text(
+              '2. Press the Shuffle Button to shuffle the card display order',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.red,
+              ),
+            ),
+            SizedBox(height: 15,),
+            Text(
+              '3. Press the Plus Button to create new Word Card',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.red,
+              ),
+            ),
+            SizedBox(height: 15,),
+            Text(
+              '4. Press and Hold on the Word Card to change Word and Author',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget mainView(){
+    return Container(
+      child: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: quotes.map((quote) {
+
+              if(quote.found){
+                cardcolor = Colors.orangeAccent.withOpacity(0.5);
+              } else {
+                cardcolor = Colors.white;
+              }
+
+              if(viewMode) {
+                return ViewQuoteCard(
+                  quote: quote,
+                  color: cardcolor,
+                  changeColor: () => changeCardColor(quote),
+                );
+              }
+
+              return EditQuoteCard(
+                quote: quote,
+                color: cardcolor,
+                changeColor: () => changeCardColor(quote),
+                delete: () {
+                  setState(() {
+                    quotes.remove(quote);
+                  });
+                },
+                changeText: () async {
+                  await _displayTextInputDialog(context);
+                  setState(() {
+
+                    if(valueText1 != null) {quote.text = valueText1!;}
+                    if(valueText2 != null) {quote.author = valueText2!;}
+                    makeValueNull();
+
+                  });
+                },
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _displayTextInputDialog(BuildContext context) async {
@@ -111,56 +225,15 @@ class _QuoteHomeState extends State<QuoteHome> {
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: quotes.map((quote) {
+      body: quotes.isEmpty ? tutorialDisplay() : mainView(),
 
-              if(quote.found){
-                cardcolor = Colors.orangeAccent.withOpacity(0.5);
-              } else {
-                cardcolor = Colors.white;
-              }
-
-              if(viewMode) {
-                return ViewQuoteCard(
-                  quote: quote,
-                  color: cardcolor,
-                  changeColor: () => changeCardColor(quote),
-                );
-              }
-
-
-              return EditQuoteCard(
-                quote: quote,
-                color: cardcolor,
-                changeColor: () => changeCardColor(quote),
-                delete: () {
-                  setState(() {
-                    quotes.remove(quote);
-                  });
-                },
-                changeText: () async {
-                  await _displayTextInputDialog(context);
-                  setState(() {
-
-                    if(valueText1 != null) {quote.text = valueText1!;}
-                    if(valueText2 != null) {quote.author = valueText2!;}
-                    makeValueNull();
-
-                  });
-                },
-              );
-            }).toList(),
-          ),
-        ),
-      ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            backgroundColor: Colors.blue[300],
+            backgroundColor: colorOnEmpty(),
             onPressed: () {
+              if(quotes.isEmpty) return;
               setState(() {
                 viewMode = !viewMode;
               });
@@ -172,8 +245,9 @@ class _QuoteHomeState extends State<QuoteHome> {
           ),
           SizedBox(height: 20,),
           FloatingActionButton(
-            backgroundColor: Colors.blue[300],
+            backgroundColor: colorOnEmpty(),
             onPressed: () {
+              if(quotes.isEmpty) return;
               setState(() {
                 quotes.shuffle();
               });
@@ -186,8 +260,6 @@ class _QuoteHomeState extends State<QuoteHome> {
           SizedBox(height: 20,),
           FloatingActionButton(
             backgroundColor: Colors.blue[300],
-
-
             onPressed: () async {
               await _displayTextInputDialog(context);
               setState(() {
@@ -205,16 +277,14 @@ class _QuoteHomeState extends State<QuoteHome> {
           ),
           SizedBox(height: 20,),
           FloatingActionButton(
-            backgroundColor: Colors.blue[300],
+            backgroundColor: colorOnEmpty(),
             onPressed: () async {
+              if(quotes.isEmpty) return;
               String text = '';
 
                 await Save().writeFile(quotes);
                 text = await (Save().readFile()) as String;
                 print(jsonDecode(text)['found']);
-
-
-
 
               /*setState(() {
                 quotes.clear();
