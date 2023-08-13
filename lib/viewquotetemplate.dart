@@ -15,7 +15,7 @@ class ViewQuoteCard extends StatelessWidget {
     return GestureDetector(
       onTap: changeColor,
       child: Card(
-        margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
+        margin: EdgeInsets.fromLTRB(16, 20, 16, 0),
         color: color,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
