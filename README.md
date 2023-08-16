@@ -1,16 +1,7 @@
-# quotelist
+# WordShuffler
 
-A new Flutter project.
+WordShuffler for "Empire", a party game. An Android App made with Flutter with Android apk file avalible in Release section. The app is designed to be used by the party game host who shall read the list of words in shuffled order and may keep track of the words that have been guessed.
 
-## Getting Started
+# Empire Game Rules
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The game is played at parties where people pick a theme andd must come up with a secret word. The players only tell their secret word, related to the theme, to the host of the game. The players must make sure no one else knows their secret word. The host then reads all the words to the players and the players go in a clockwise or counterclockwise direction, in a circle, attempting to guess the secret words of any other players. Once the player aks the secret word of another player, if the player does not guess the secret word, the person next in the circle attempts to guess the secret word of any player in the game. If the player guessed the secret word of another player, then the player whos word has been guessed joins the empire of the player who guessed their secret word. The players who just guessed the word of another player can guess again until he guessed the secret words, of players who are still not guessed, incorrectly. The game is won by the player whos secret word has not been guessed, and everyone else is in the empire of that player. The players in the empire are allwed to assist the player who is the "leader" of the empire by providing verbal assistance and sharing their assumptions of the secret words of other players. The game also requires a psychological factor to trick, throw off or become forgettable, during the game, to survive as long as possible.
