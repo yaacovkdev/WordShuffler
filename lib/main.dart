@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:quotelist/viewquotetemplate.dart';
-import 'package:radial_button/widget/circle_floating_button.dart';
 import 'quote.dart';
 import 'quotetemplate.dart';
 import 'save.dart';
@@ -17,22 +16,52 @@ void main() {
 }
 
 class QuoteHome extends StatefulWidget {
-
   @override
   State<QuoteHome> createState() => _QuoteHomeState();
 }
 
 class _QuoteHomeState extends State<QuoteHome> {
 
+
+
   List<Quote> quotes = [];
 
   Save save = new Save();
   bool viewMode = false;
+  bool filesLoaded = false;
+  bool saveInstance = false;
 
   final TextEditingController _textFieldController1 = TextEditingController();
   final TextEditingController _textFieldController2 = TextEditingController();
   String? valueText1, valueText2;
   Color cardcolor = Colors.white;
+
+  Future<void> getFileQuotes() async {
+
+    if(!filesLoaded) {
+      String text = (await save.readFile());
+      if(!text.isEmpty) {
+        List<String> textList = text.split('\n');
+
+        //Ugly List Notation
+        List jsonObjects = textList.map((quote) => jsonDecode(quote)).toList();
+        quotes = jsonObjects.map((jsonObjects) {
+          Quote q = Quote(
+              author: jsonObjects['author'], text: jsonObjects['text']);
+          q.found = jsonObjects['found'];
+          return q;
+        }).toList();
+      }
+
+      //solution to cancel the blank screen at the app launch
+      setState(() {
+        filesLoaded = true;
+      });
+    } else if(saveInstance){
+      await save.writeFile(quotes);
+      saveInstance = false;
+    }
+  }
 
   makeValueNull(){
     valueText1 = null;
@@ -49,6 +78,7 @@ class _QuoteHomeState extends State<QuoteHome> {
         cardcolor = Colors.orangeAccent;
         quote.found = true;
       }
+      saveInstance = true;
     });
   }
 
@@ -63,11 +93,27 @@ class _QuoteHomeState extends State<QuoteHome> {
     }
   }
 
+  Widget decideDisplay(){
+    getFileQuotes();
+
+    //mainView is literally an empty scrollable screen cause quotes are empty
+    if(!filesLoaded){
+
+      return mainView();
+    }
+
+    if (quotes.isEmpty){
+      return tutorialDisplay();
+    }
+    return mainView();
+  }
+
   Widget tutorialDisplay(){
+
     return Container(
       margin: EdgeInsets.all(50),
 
-      child: SingleChildScrollView(
+      child: const SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -144,7 +190,9 @@ class _QuoteHomeState extends State<QuoteHome> {
                 delete: () {
                   setState(() {
                     quotes.remove(quote);
+                    saveInstance = true;
                   });
+
                 },
                 changeText: () async {
                   await _displayTextInputDialog(context);
@@ -153,8 +201,9 @@ class _QuoteHomeState extends State<QuoteHome> {
                     if(valueText1 != null) {quote.text = valueText1!;}
                     if(valueText2 != null) {quote.author = valueText2!;}
                     makeValueNull();
-
+                    saveInstance = true;
                   });
+
                 },
               );
             }).toList(),
@@ -221,11 +270,11 @@ class _QuoteHomeState extends State<QuoteHome> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Empire Shuffler v0.1'),
+        title: Text('Empire Shuffler v0.1.2'),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
-      body: quotes.isEmpty ? tutorialDisplay() : mainView(),
+      body: decideDisplay(),
 
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -265,33 +314,14 @@ class _QuoteHomeState extends State<QuoteHome> {
               setState(() {
                 quotes.add(Quote(
                     author: valueText2 == null ? "Anonymous" : valueText2!,
-                    text: valueText1 == null ? "" : valueText1!),
-                );
+                    text: valueText1 == null ? "" : valueText1!
+                ));
                 makeValueNull();
+                saveInstance = true;
               });
             },
             child: const Icon(
               Icons.add,
-              size: 40,
-            ),
-          ),
-          SizedBox(height: 20,),
-          FloatingActionButton(
-            backgroundColor: colorOnEmpty(),
-            onPressed: () async {
-              if(quotes.isEmpty) return;
-              String text = '';
-
-                await Save().writeFile(quotes);
-                text = await (Save().readFile()) as String;
-                print(jsonDecode(text)['found']);
-
-              /*setState(() {
-                quotes.clear();
-              });*/
-            },
-            child: const Icon(
-              Icons.save,
               size: 40,
             ),
           ),

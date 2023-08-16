@@ -23,11 +23,19 @@ class Save {
   Future<void> writeFile(List<Quote> quotes) async {
     final file = await _localFile;
 
+    /*if(quotes.isEmpty){
+      file.writeAsStringSync('');
+    }*/
+
     // Write the file
-    print('writing');
-    await file.writeAsString(jsonEncode(quotes[0]));
+    String _objtext = '';
+    for (var i = 0; i<quotes.length; i++){
+      _objtext += '${jsonEncode(quotes[i])}\n';
+    }
 
+    if(!_objtext.isEmpty) _objtext = _objtext.substring(0,_objtext.length-1);
 
+    await file.writeAsString(_objtext);
   }
 
   Future<String> readFile() async {
