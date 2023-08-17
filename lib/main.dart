@@ -1,35 +1,33 @@
 import 'dart:convert';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:quotelist/viewquotetemplate.dart';
-import 'quote.dart';
-import 'quotetemplate.dart';
-import 'save.dart';
+import 'package:quotelist/save.dart';
+import 'viewquotetemplate.dart';
+import 'package:quotelist/quote.dart';
+import 'package:quotelist/quotetemplate.dart';
 
 void main() {
 
   runApp(MaterialApp(
-    home: QuoteHome(),
+    home: QuoteHome(save: Save()),
   ));
 
 }
 
 class QuoteHome extends StatefulWidget {
+  const QuoteHome({super.key, required this.save});
+  final Save save;
+
   @override
   State<QuoteHome> createState() => _QuoteHomeState();
 }
 
 class _QuoteHomeState extends State<QuoteHome> {
-
-
-
   List<Quote> quotes = [];
 
-  Save save = new Save();
   bool viewMode = false;
   bool filesLoaded = false;
   bool saveInstance = false;
+
 
   final TextEditingController _textFieldController1 = TextEditingController();
   final TextEditingController _textFieldController2 = TextEditingController();
@@ -39,8 +37,10 @@ class _QuoteHomeState extends State<QuoteHome> {
   Future<void> getFileQuotes() async {
 
     if(!filesLoaded) {
-      String text = (await save.readFile());
-      if(!text.isEmpty) {
+
+      String text = (await widget.save.readFile());
+
+      if(text.isNotEmpty) {
         List<String> textList = text.split('\n');
 
         //Ugly List Notation
@@ -58,8 +58,9 @@ class _QuoteHomeState extends State<QuoteHome> {
         filesLoaded = true;
       });
     } else if(saveInstance){
-      await save.writeFile(quotes);
       saveInstance = false;
+      await widget.save.writeFile(quotes);
+
     }
   }
 

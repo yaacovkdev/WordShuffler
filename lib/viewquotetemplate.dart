@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:quotelist/quote.dart';
+import 'quote.dart';
 
 class ViewQuoteCard extends StatelessWidget {
 

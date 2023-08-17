@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Quote{
   String author;
   String text;
