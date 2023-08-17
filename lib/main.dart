@@ -271,7 +271,7 @@ class _QuoteHomeState extends State<QuoteHome> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Empire Shuffler v0.1.2'),
+        title: Text('Word Shuffler'),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
