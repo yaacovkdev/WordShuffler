@@ -196,6 +196,8 @@ class _QuoteHomeState extends State<QuoteHome> {
 
                 },
                 changeText: () async {
+                  _textFieldController1.text = quote.text;
+                  _textFieldController2.text = quote.author;
                   await _displayTextInputDialog(context);
                   setState(() {
 
@@ -220,7 +222,7 @@ class _QuoteHomeState extends State<QuoteHome> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Quote Menu'),
+            title: Text('Word Menu'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
