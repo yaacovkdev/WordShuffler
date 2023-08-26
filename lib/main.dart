@@ -31,7 +31,6 @@ class _QuoteHomeState extends State<QuoteHome> {
 
   final TextEditingController _textFieldController1 = TextEditingController();
   final TextEditingController _textFieldController2 = TextEditingController();
-  String? valueText1, valueText2;
   Color cardcolor = Colors.white;
 
   Future<void> getFileQuotes() async {
@@ -47,7 +46,8 @@ class _QuoteHomeState extends State<QuoteHome> {
         List jsonObjects = textList.map((quote) => jsonDecode(quote)).toList();
         quotes = jsonObjects.map((jsonObjects) {
           Quote q = Quote(
-              author: jsonObjects['author'], text: jsonObjects['text']);
+              author: jsonObjects['author'], text: jsonObjects['text']
+          );
           q.found = jsonObjects['found'];
           return q;
         }).toList();
@@ -64,9 +64,9 @@ class _QuoteHomeState extends State<QuoteHome> {
     }
   }
 
-  makeValueNull(){
-    valueText1 = null;
-    valueText2 = null;
+  resetControllers(){
+    _textFieldController1.text = "";
+    _textFieldController2.text = "Anonymous";
   }
 
   changeCardColor(Quote quote) {
@@ -200,10 +200,8 @@ class _QuoteHomeState extends State<QuoteHome> {
                   _textFieldController2.text = quote.author;
                   await _displayTextInputDialog(context);
                   setState(() {
-
-                    if(valueText1 != null) {quote.text = valueText1!;}
-                    if(valueText2 != null) {quote.author = valueText2!;}
-                    makeValueNull();
+                    quote.text = _textFieldController1.text;
+                    quote.author = _textFieldController2.text;
                     saveInstance = true;
                   });
 
@@ -227,20 +225,10 @@ class _QuoteHomeState extends State<QuoteHome> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  onChanged: (value1) {
-                    setState(() {
-                      valueText1 = value1;
-                    });
-                  },
                   controller: _textFieldController1,
                   decoration: InputDecoration(hintText: "Word"),
                 ),
                 TextField(
-                  onChanged: (value2) {
-                    setState(() {
-                      valueText2 = value2;
-                    });
-                  },
                   controller: _textFieldController2,
                   decoration: InputDecoration(hintText: "Author"),
                 ),
@@ -254,12 +242,7 @@ class _QuoteHomeState extends State<QuoteHome> {
                 textColor: Colors.white,
                 child: Text('OK'),
                 onPressed: () {
-
-                  setState(() {
-                    _textFieldController1.text = "";
-                    _textFieldController2.text = "";
-                    Navigator.pop(context);
-                  });
+                  setState(() {Navigator.pop(context);});
                 },
               ),
             ],
@@ -313,13 +296,13 @@ class _QuoteHomeState extends State<QuoteHome> {
           FloatingActionButton(
             backgroundColor: Colors.blue[300],
             onPressed: () async {
+              resetControllers();
               await _displayTextInputDialog(context);
               setState(() {
                 quotes.add(Quote(
-                    author: valueText2 == null ? "Anonymous" : valueText2!,
-                    text: valueText1 == null ? "" : valueText1!
+                    author: _textFieldController2.text,
+                    text: _textFieldController1.text,
                 ));
-                makeValueNull();
                 saveInstance = true;
               });
             },
